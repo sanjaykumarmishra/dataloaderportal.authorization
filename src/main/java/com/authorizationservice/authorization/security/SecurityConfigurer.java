@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.authorizationservice.authorization.filters.JwtRequestFilter;
@@ -21,12 +22,15 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	
 	@Autowired
 	JwtRequestFilter jwtRequestFilter;
+	@Autowired
+	private AuthEntryPointJwt unauthorizedHandler;
+
 	
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception{
-		httpSecurity.csrf().disable()
+		httpSecurity.csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 		.authorizeRequests()
-		.antMatchers("/login","/validate","/health-check").permitAll()
+		.antMatchers("/login","/validate","/health-check","/signup").permitAll()
 		.antMatchers("/configuration/security","/configuration/ui").permitAll()
 		.anyRequest().authenticated()
 		.and().sessionManagement()
@@ -47,5 +51,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter{
 	public AuthenticationManager authenticationManagerBean() throws Exception{
 		return super.authenticationManager();
 	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+
 
 }

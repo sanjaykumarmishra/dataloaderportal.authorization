@@ -9,6 +9,6 @@ import com.authorizationservice.authorization.model.AuthenticationRequest;
 
 @Repository
 public 	interface AuthRequestRepo extends JpaRepository<AuthenticationRequest,String>{
-	
+    public Boolean existsByUsername(String username);
 
 }
